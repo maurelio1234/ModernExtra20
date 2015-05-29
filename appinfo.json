@@ -1,47 +1,49 @@
 {
-    "versionLabel": "1.0.0",
-    "uuid": "b03f16a0-7cbb-11e3-baa7-0800200c9a66",
     "appKeys": {
         "dummy": 0
     },
-    "longName": "Modern Longlife",
-    "versionCode": 1,
     "capabilities": [
         ""
     ],
-    "shortName": "Modern Longlife",
     "companyName": "Zalew/Fowler",
-    "watchapp": {
-        "watchface": true
-    },
+    "longName": "Marcos Modern Longlife",
+    "projectType": "native",
     "resources": {
         "media": [
             {
-                "type": "png",
-                "name": "BLUETOOTH",
-                "file": "images/bluetooth.png"
-            },
-            {
-                "type": "png",
-                "name": "BATTERY_CHARGE",
-                "file": "images/battery-charge.png"
-            },
-            {
-                "type": "png",
-                "name": "BATTERY_ICON",
-                "file": "images/battery_icon.png"
-            },
-            {
-                "menuIcon": true,
-                "type": "png",
-                "name": "IMAGE_MENU_ICON",
-                "file": "images/modern_logo.png"
-            },
-            {
-                "type": "png",
+                "file": "images/modern_background_new.png",
                 "name": "IMAGE_BACKGROUND",
-                "file": "images/modern_background_new.png"
+                "type": "png"
+            },
+            {
+                "file": "images/modern_logo.png",
+                "menuIcon": true,
+                "name": "IMAGE_MENU_ICON",
+                "type": "png"
+            },
+            {
+                "file": "images/battery_icon.png",
+                "name": "BATTERY_ICON",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-charge.png",
+                "name": "BATTERY_CHARGE",
+                "type": "png"
+            },
+            {
+                "file": "images/bluetooth.png",
+                "name": "BLUETOOTH",
+                "type": "png"
             }
         ]
+    },
+    "sdkVersion": "2",
+    "shortName": "Marcos Modern Longlife",
+    "uuid": "b99d652a-05f0-11e5-a6c0-1697f925ec7b",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
     }
 }
