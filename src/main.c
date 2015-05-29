@@ -4,6 +4,12 @@
 static Window* window;
 static GBitmap *background_image_container;
 
+// DCK
+TextLayer *recife_text_layer;
+TextLayer *taipei_text_layer;
+char*     recife_buffer = "R00:01"; // using different strings so that the compiler wont optimize them to a single value!
+char*     taipei_buffer = "T00:02";
+
 static Layer *minute_display_layer;
 static Layer *hour_display_layer;
 static Layer *center_display_layer;
@@ -53,6 +59,57 @@ int32_t second_angle_anim = 0;
 unsigned int minute_angle_anim = 0;
 unsigned int hour_angle_anim = 0;
 
+//DCK
+void update_buffer(char* buffer, struct tm *tick_time) {
+  // Write the current hours and minutes into the buffer
+  if(clock_is_24h_style() == true) {
+    // Use 24 hour format
+    strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
+  } else {
+    // Use 12 hour format
+    strftime(buffer, sizeof("00:00"), "%I:%M", tick_time);
+  }    
+}
+void update_double_time() {
+  time_t temp = time(NULL);
+
+  temp = temp - 5*60*60;
+  update_buffer(recife_buffer+1, localtime(&temp)); // TODO: beware! pointer arithmetics!
+  
+  temp = temp + 5*60*60 + 6*60*60;
+  update_buffer(taipei_buffer+1, localtime(&temp)); // TODO: beware! pointer arithmetics!
+    
+  // Display this time on the TextLayer
+  text_layer_set_text(recife_text_layer, recife_buffer);  
+  text_layer_set_text(taipei_text_layer, taipei_buffer);  
+}
+void init_double_time(void) {
+	recife_text_layer = text_layer_create(GRect(-77, 100, 144, 100));
+	taipei_text_layer = text_layer_create(GRect(-30, 100, 144, 130));
+
+	// Set the text, font, and text alignment
+ 	text_layer_set_font(recife_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_text_alignment(recife_text_layer, GTextAlignmentRight);
+	text_layer_set_text_color(recife_text_layer, GColorWhite);
+	text_layer_set_background_color(recife_text_layer, GColorClear);
+
+  text_layer_set_font(taipei_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_text_alignment(taipei_text_layer, GTextAlignmentRight);
+	text_layer_set_text_color(taipei_text_layer, GColorWhite);
+	text_layer_set_background_color(taipei_text_layer, GColorClear);
+
+	// Add the text layer to the window
+	layer_add_child(window_get_root_layer(window), text_layer_get_layer(recife_text_layer));
+	layer_add_child(window_get_root_layer(window), text_layer_get_layer(taipei_text_layer));
+
+  update_double_time();
+}
+
+void deinit_double_time(void) {
+	text_layer_destroy(recife_text_layer);
+	text_layer_destroy(taipei_text_layer);  
+}
+
 void handle_timer(void* vdata) {
 
 	int *data = (int *) vdata;
@@ -76,7 +133,8 @@ void handle_timer(void* vdata) {
 					&handle_timer, &my_cookie);
 		}
 	}
-
+  
+  update_double_time();
 }
 
 void second_display_layer_update_callback(Layer *me, GContext* ctx) {
@@ -123,6 +181,8 @@ void center_display_layer_update_callback(Layer *me, GContext* ctx) {
 	graphics_fill_circle(ctx, center, 4);
 	graphics_context_set_fill_color(ctx, GColorWhite);
 	graphics_fill_circle(ctx, center, 3);
+  
+  update_double_time();
 }
 
 void minute_display_layer_update_callback(Layer *me, GContext* ctx) {
@@ -269,7 +329,9 @@ void init() {
 	text_layer_set_font(date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
 	layer_add_child(window_layer, text_layer_get_layer(date_layer));
 
+  init_double_time();
 	draw_date();
+  update_double_time();
 
 	// Status setup
 	icon_battery = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_ICON);
@@ -338,6 +400,7 @@ void deinit() {
 	layer_destroy(second_display_layer);
 	layer_destroy(battery_layer);
 	layer_destroy(bt_layer);
+  deinit_double_time();
 
 #ifdef INVERSE
 	inverter_layer_destroy(full_inverse_layer);
@@ -357,6 +420,7 @@ void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
 		timer_handle = app_timer_register(50 /* milliseconds */, &handle_timer,
 				&my_cookie);
 	} else if (init_anim == ANIM_DONE) {
+    update_double_time();
 		if (tick_time->tm_sec % 10 == 0) {
 			layer_mark_dirty(minute_display_layer);
 
