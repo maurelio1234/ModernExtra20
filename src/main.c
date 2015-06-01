@@ -20,6 +20,10 @@ static bool bt_ok = false;
 static uint8_t battery_level;
 static bool battery_plugged;
 
+// TBTR
+TextLayer *battery_label_text_layer;
+static char battery_level_buffer[] = "100%";
+
 static GBitmap *icon_battery;
 static GBitmap *icon_battery_charge;
 static GBitmap *icon_bt;
@@ -82,7 +86,12 @@ void update_double_time() {
   // Display this time on the TextLayer
   text_layer_set_text(recife_text_layer, recife_buffer);  
   text_layer_set_text(taipei_text_layer, taipei_buffer);  
+  
+  //TBTR
+  snprintf(battery_level_buffer, sizeof(battery_level_buffer), "%d%%", battery_level);
+  text_layer_set_text(battery_label_text_layer, battery_level_buffer);  
 }
+
 void init_double_time(void) {
 	recife_text_layer = text_layer_create(GRect(-77, 100, 144, 100));
 	taipei_text_layer = text_layer_create(GRect(-30, 100, 144, 130));
@@ -102,12 +111,21 @@ void init_double_time(void) {
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(recife_text_layer));
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(taipei_text_layer));
 
+  // TBTR
+	battery_label_text_layer = text_layer_create(GRect(0, 52, 144, 100));
+  text_layer_set_font(battery_label_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
+	text_layer_set_text_color(battery_label_text_layer, GColorWhite);
+	text_layer_set_background_color(battery_label_text_layer, GColorClear);
+	text_layer_set_text_alignment(battery_label_text_layer, GTextAlignmentCenter);
+	layer_add_child(window_get_root_layer(window), text_layer_get_layer(battery_label_text_layer ));
+  
   update_double_time();
 }
 
 void deinit_double_time(void) {
 	text_layer_destroy(recife_text_layer);
 	text_layer_destroy(taipei_text_layer);  
+	text_layer_destroy(battery_label_text_layer);  
 }
 
 void handle_timer(void* vdata) {
